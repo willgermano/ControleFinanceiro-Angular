@@ -1,0 +1,45 @@
+.dadosCategorias{
+  padding: 30px 30px 30px 30px;
+}
+
+.tabela{
+  width: 100%;
+  padding-top: 30px;
+}
+
+.mat-row .mat-cell {
+  border-bottom: 1px solid transparent;
+  border-top: 1px solid transparent;
+  cursor: pointer;
+}
+
+.mat-row:hover .mat-cell {
+  border-color: currentColor;
+}
+
+.demo-row-is-clicked {
+  font-weight: bold;
+}
+
+.divCard{
+  padding: 50px;
+  width: 600px;
+}
+
+.mat-form-field.mat-form-field{
+  width: 500px;
+}
+
+.cabecalho
+{
+  padding-top: 30px;
+  padding-bottom: 30px;
+}
+
+.titulo
+{
+  position: absolute;
+  left: 5px;
+}
+
+
