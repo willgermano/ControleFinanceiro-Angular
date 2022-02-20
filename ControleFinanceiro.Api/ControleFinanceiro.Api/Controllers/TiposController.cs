@@ -13,17 +13,17 @@ namespace ControleFinanceiro.Api.Controllers
     [ApiController]
     public class TiposController : ControllerBase
     {
-        private readonly Context _context;
+        private readonly Contexto _contexto;
 
-        public TiposController(Context context)
+        public TiposController(Contexto context)
         {
-            _context = context;
+            _contexto = context;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Tipo>>> GetTipos()
         {
-            return await _context.Tipos.ToListAsync();
+            return await _contexto.Tipos.ToListAsync();
         }
     }
 }

@@ -1,4 +1,6 @@
 using ControleFinanceiro.Data;
+using ControleFinanceiro.Data.Interfaces;
+using ControleFinanceiro.Data.Repository;
 using ControleFinanceiro.Domain.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -31,10 +33,15 @@ namespace ControleFinanceiro.Api
         public void ConfigureServices(IServiceCollection services)
         {
             //Configurar a classe de contexto
-            services.AddDbContext<Context>(opcoes => opcoes.UseSqlServer(Configuration.GetConnectionString("ConexaoDB")));
+            services.AddDbContext<Contexto>(opcoes => opcoes.UseSqlServer(Configuration.GetConnectionString("ConexaoDB")));
 
             //Configura Identity
-            services.AddIdentity<Usuario, Funcao>().AddEntityFrameworkStores<Context>();
+            services.AddIdentity<Usuario, Funcao>().AddEntityFrameworkStores<Contexto>();
+
+            //Configurar Interfaces
+            //Interface Repository
+            services.AddScoped<ICategoriaRepositorio, CategoriaRepositorio>();
+
 
             //Responsavel por fazer a comunicacao entre o Angular e Api (Front e Back)
             services.AddCors();

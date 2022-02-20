@@ -1,5 +1,7 @@
 ﻿using ControleFinanceiro.Data;
+using ControleFinanceiro.Data.Interfaces;
 using ControleFinanceiro.Domain.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -13,25 +15,25 @@ namespace ControleFinanceiro.Api.Controllers
     [ApiController]
     public class CategoriasController : ControllerBase
     {
-        private readonly Context _context;
+        private readonly ICategoriaRepositorio _categoriaRepositorio;
 
-        public CategoriasController(Context context)
+        public CategoriasController(ICategoriaRepositorio categoriaRepositorio)
         {
-            _context = context;
+            _categoriaRepositorio = categoriaRepositorio;
         }
 
+        //[Authorize(Roles = "Administrador")]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Categoria>>> GetCategoria()
+        public async Task<ActionResult<IEnumerable<Categoria>>> GetCategorias()
         {
-            return await _context.Categorias
-                            .Include(c => c.Tipo)
-                            .ToListAsync();
+            return await _categoriaRepositorio.PegarTodos().ToListAsync();
         }
 
+        //[Authorize(Roles = "Administrador")]
         [HttpGet("{id}")]
         public async Task<ActionResult<Categoria>> GetCategoria(int id)
         {
-            var categoria = await _context.FindAsync<Categoria>(id);
+            var categoria = await _categoriaRepositorio.PegarPeloId(id);
 
             if (categoria == null)
             {
@@ -41,22 +43,7 @@ namespace ControleFinanceiro.Api.Controllers
             return categoria;
         }
 
-        [HttpPost]
-        public async Task<ActionResult<Categoria>> PostCategoria(Categoria categoria)
-        {
-            _context.Categorias.Add(categoria);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("getCategoria", new { id = categoria.CategoriaId }, categoria);
-
-            //return Ok(new
-            //{
-            //    mensagem = $"Categoria {categoria.Nome} cadastrada com sucesso"
-            //});
-
-            //return BadRequest(categoria);
-        }
-
+        //[Authorize(Roles = "Administrador")]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCategoria(int id, Categoria categoria)
         {
@@ -65,22 +52,73 @@ namespace ControleFinanceiro.Api.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(categoria).State = EntityState.Modified;
+            if (ModelState.IsValid)
+            {
+                await _categoriaRepositorio.Atualizar(categoria);
 
-            await _context.SaveChangesAsync();
+                return Ok(new
+                {
+                    mensagem = $"Categoria {categoria.Nome} atualizado com sucesso"
+                });
+            }
 
-            return NoContent();
+            return BadRequest(ModelState);
         }
 
+        //[Authorize(Roles = "Administrador")]
+        [HttpPost]
+        public async Task<ActionResult<Categoria>> PostCategoria(Categoria categoria)
+        {
+            if (ModelState.IsValid)
+            {
+                await _categoriaRepositorio.Inserir(categoria);
+
+                return Ok(new
+                {
+                    mensagem = $"Categoria {categoria.Nome} cadastrada com sucesso"
+                });
+            }
+
+            return BadRequest(categoria);
+        }
+
+        //[Authorize(Roles = "Administrador")]
         [HttpDelete("{id}")]
         public async Task<ActionResult<Categoria>> DeleteCategoria(int id)
         {
-            var categoria = await _context.Categorias.FindAsync(id);
+            var categoria = await _categoriaRepositorio.PegarPeloId(id);
+            if (categoria == null)
+            {
+                return NotFound();
+            }
 
-            _context.Categorias.Remove(categoria);
-            await _context.SaveChangesAsync();
+            await _categoriaRepositorio.Excluir(id);
 
-            return categoria;
+            return Ok(new
+            {
+                mensagem = $"Categoria {categoria.Nome} excluída com sucesso"
+            });
+        }
+
+        //[Authorize(Roles = "Administrador")]
+        [HttpGet("FiltrarCategorias/{nomeCategoria}")]
+        public async Task<ActionResult<IEnumerable<Categoria>>> FiltrarCategorias(string nomecategoria)
+        {
+            return await _categoriaRepositorio.FiltrarCategorias(nomecategoria).ToListAsync();
+        }
+
+        //[Authorize]
+        [HttpGet("FiltrarCategoriasDespesas")]
+        public async Task<ActionResult<IEnumerable<Categoria>>> FiltrarCategoriasDespesas()
+        {
+            return await _categoriaRepositorio.PegarCategoriasPeloTipo("Despesa").ToListAsync();
+        }
+
+        //[Authorize]
+        [HttpGet("FiltrarCategoriasGanhos")]
+        public async Task<ActionResult<IEnumerable<Categoria>>> FiltrarCategoriasGanhos()
+        {
+            return await _categoriaRepositorio.PegarCategoriasPeloTipo("Ganho").ToListAsync();
         }
     }
 }

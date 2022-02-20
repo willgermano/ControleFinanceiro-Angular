@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace ControleFinanceiro.Data
 {
-    public class Context : IdentityDbContext<Usuario, Funcao, string>
+    public class Contexto : IdentityDbContext<Usuario, Funcao, string>
     {
         public DbSet<Cartao> Cartoes { get; set; }
         public DbSet<Categoria> Categorias { get; set; }
@@ -21,7 +21,7 @@ namespace ControleFinanceiro.Data
         public DbSet<Tipo> Tipos { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }
 
-        public Context(DbContextOptions<Context> opcoes) : base(opcoes) { }
+        public Contexto(DbContextOptions<Contexto> opcoes) : base(opcoes) { }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
